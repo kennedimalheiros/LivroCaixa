@@ -1,7 +1,7 @@
 Create database caixa
 use caixa
 -- -----------------------------------------------------
--- Table `usuarios`
+-- Table Usuarios
 -- -----------------------------------------------------
 
 
@@ -12,13 +12,13 @@ CREATE  TABLE usuarios (
   login VARCHAR(45) NOT NULL ,
   senha VARCHAR(45) NOT NULL ,
   data DATETIME NOT NULL ,
-  nivel INT NOT NULL,-- COMMENT '0 Administrador\n1 Usuario Com Relatorios\n2 Usuarios Basico'
+  nivel INT NOT NULL,-- COMMENT 0 Administrador  1 Usuario Com Relatorios  2 Usuarios Basico
   PRIMARY KEY (cod) 
   )
 
 
 -- -----------------------------------------------------
--- Table `caixas`
+-- Table Caixas
 -- -----------------------------------------------------
 
 CREATE  TABLE caixas (
@@ -29,7 +29,7 @@ CREATE  TABLE caixas (
   usuarioFechamento INT NULL ,
   valorAbertura DECIMAL(8,2) NOT NULL ,
   valorFechamento DECIMAL(8,2) NULL ,
-  periodo BIT NOT NULL, -- COMMENT '0 Dia\n1 Noite\n'
+  periodo BIT NOT NULL, -- COMMENT 0 Dia  1 Noite\n
   PRIMARY KEY (cod),
   FOREIGN KEY (usuarioAbertura)
 	REFERENCES usuarios (cod), 
@@ -38,30 +38,30 @@ CREATE  TABLE caixas (
   )
 
 -- -----------------------------------------------------
--- Table `tipos`
+-- Table Tipos
 -- -----------------------------------------------------
 
---COMMENT = 'Tipo Operação\nSangria\nSuprimento\nCompra material\nCompra etc.' /* comment truncated */ ;
+--COMMENT = 'Tipo Operação\nSangria\nSuprimento\nCompra material\nCompra etc.'
 
 CREATE  TABLE tipos (
   cod INT NOT NULL ,
   descricao VARCHAR(45) NOT NULL ,
-  acao BIT NOT NULL, -- COMMENT '0 Debito \n1 Credito'
+  acao BIT NOT NULL, -- COMMENT 0 Debito 1 Credito
   PRIMARY KEY (cod) 
   )
 
 
 
 -- -----------------------------------------------------
--- Table `movimentacoes`
+-- Table Movimentacões
 -- -----------------------------------------------------
 
 CREATE  TABLE movimentacoes (
   cod INT NOT NULL ,
   data DATETIME NOT NULL ,
   usuario INT NOT NULL ,
-  tipo INT NOT NULL, -- COMMENT 'Suprimento\nSangria\n'
-  caixa INT NOT NULL, -- COMMENT '0 Dia\n1 Noite'
+  tipo INT NOT NULL, -- COMMENT Suprimento, Sangria
+  caixa INT NOT NULL, -- COMMENT 0 Dia  1 Noite
   PRIMARY KEY (cod),
   FOREIGN KEY (usuario)
 	REFERENCES usuarios (cod),
@@ -70,5 +70,5 @@ CREATE  TABLE movimentacoes (
   )
 
 
-Create procedure SPAberturaCaixa
+Create procedure SpAberturaCaixa
 AS
