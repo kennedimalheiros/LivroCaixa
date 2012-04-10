@@ -9,12 +9,14 @@ use caixa
 CREATE  TABLE usuarios (
   cod INT Identity(1,1) NOT NULL ,
   nome VARCHAR(60) NOT NULL ,
-  login VARCHAR(45) NOT NULL ,
+  usuario VARCHAR(45) NOT NULL ,
   senha VARCHAR(45) NOT NULL ,
   data DATETIME NOT NULL ,
   nivel INT NOT NULL,-- COMMENT 0 Administrador  1 Usuario Com Relatorios  2 Usuarios Basico
   PRIMARY KEY (cod) 
   )
+
+INSERT INTO usuarios ()
 
 
 -- -----------------------------------------------------
