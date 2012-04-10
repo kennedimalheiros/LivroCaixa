@@ -16,7 +16,7 @@ CREATE  TABLE usuarios (
   PRIMARY KEY (cod) 
   )
 
-INSERT INTO usuarios ()
+INSERT INTO usuarios (nome, usuario, senha, data, nivel) VALUES ('master', 'Adiministrador', '123', getdate(), 0)
 
 
 -- -----------------------------------------------------
@@ -38,6 +38,9 @@ CREATE  TABLE caixas (
   FOREIGN KEY (usuarioFechamento)
 	REFERENCES usuarios (cod) 	
   )
+
+INSERT INTO caixas (dataAbertura, dataFechamento, usuarioAbertura, usuarioFechamento, valorAbertura, valorFechamento, periodo)
+					values (GETDATE(),null, 1,null, 100, null, 0)
 
 -- -----------------------------------------------------
 -- Table Tipos
