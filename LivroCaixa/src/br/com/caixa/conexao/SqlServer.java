@@ -16,6 +16,11 @@ import java.sql.*; // Importando biblioteca java SQL para conexões.
  */
 public class SqlServer {
 
+    /**
+     * Fazendo conexão com o banco de dados
+     * @return Uma Conexão
+     * @throws SQLException 
+     */
     public static Connection getConexaoSQL() throws SQLException {
         try {
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
