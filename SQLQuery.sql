@@ -44,8 +44,7 @@ CREATE  TABLE caixas (
 
 CREATE INDEX ixValor caixas(valor)
 
-INSERT INTO caixas (dataAbertura, dataFechamento, usuarioAbertura, usuarioFechamento, valorAbertura, valorFechamento, periodo)
-					values (GETDATE(),null, 1,null, 100, null, 0, 0)
+EXEC SpAberturaCaixa
 
 -- -----------------------------------------------------
 -- Table Tipos
@@ -97,12 +96,32 @@ INSERT INTO movimentacoes (data, usuario, tipo, caixa, valor)
 				   VALUES (GETDATE(),  1,   1,      1,    100 ) 
 
 
-
-Create procedure SpMovimentacao
+--INICIL DA PROCEDURE SpAberturaCaixa
+Create procedure SpAberturaCaixa
 AS
-Begin Tran
-if 
 
+if ( (SELECT COUT(*) FROM caixas WHERE situacao=0) <=0 )
+  BEGIN TRAN
+	INSERT INTO caixas (dataAbertura, dataFechamento, usuarioAbertura, usuarioFechamento, valorAbertura, valorFechamento, periodo)
+			values (GETDATE(),null, 1,null, 100, null, 0, 0)
+	IF(@@ERRO = 0)
+		BEGIN
+		    COMMIT
+		    SELECT 'OPERAÇÃO REALIZADA COM SUCESSO.'
+		END
+	ELSE 
+		BEGIN
+		    ROLLBACK
+		    SELECT 'ERRO FOI ENCONTRADO AO REALIZAR ESTA OPERAÇÃO'
 
+END
+
+ELSE
+  BEGIN
+	ROLLBACK
+	SELECT 'ERRO: EXISTE OUTRO CAIXA EM ABERTO, NECESSARIO FECHAR PARA CONTINUAR.'
+
+END
+--FIM DA PROCEDURE SpAberturaCaixa
 
 select * from caixas where dataFechamento != NULL
