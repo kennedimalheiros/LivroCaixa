@@ -15,6 +15,10 @@ CREATE  TABLE usuarios (
   PRIMARY KEY (cod) 
   )
 
+CREATE INDEX ixNome usuarios(nome)
+CREATE INDEX ixUsuario usuarios(usuario)
+CREATE INDEX ixNivel usuarios(nivel)
+
 INSERT INTO usuarios (nome, usuario, senha, data, nivel) VALUES ('master', 'Adiministrador', '123', getdate(), 0)
 
 
@@ -37,14 +41,16 @@ CREATE  TABLE caixas (
 	REFERENCES caixas (cod) 	
   )
 
-INSERT INTO caixas (data, usuario, valor, periodo, situacao, codcaixa)
-					values (GETDATE(), 1, 100, 0, 0, null)
+
+CREATE INDEX ixValor caixas(valor)
+
+EXEC SpAberturaCaixa
 
 -- -----------------------------------------------------
 -- Table Tipos
 -- -----------------------------------------------------
 
---COMMENT = 'Tipo Operação\nSangria\nSuprimento\nCompra material\nCompra etc.'
+--COMMENT = 'Tipo Opera??o\nSangria\nSuprimento\nCompra material\nCompra etc.'
 
 CREATE  TABLE tipos (
   cod INT Identity(1,1) ,
@@ -52,6 +58,9 @@ CREATE  TABLE tipos (
   acao BIT NOT NULL, -- COMMENT 0 Debito 1 Credito
   PRIMARY KEY (cod) 
   )
+
+CREATE INDEX ixDescricao tipos(descricao)
+
   INSERT INTO tipos (descricao, acao) VALUES ('ABRI_CAIXA', 1)
   INSERT INTO tipos (descricao, acao) VALUES ('SANGRIA', 0)
   INSERT INTO tipos (descricao, acao) VALUES ('COMPRA', 0)
@@ -60,7 +69,7 @@ CREATE  TABLE tipos (
  
   
 -- -----------------------------------------------------
--- Table Movimentacões
+-- Table Movimentac?es
 -- -----------------------------------------------------
 
 CREATE  TABLE movimentacoes (
@@ -77,6 +86,9 @@ CREATE  TABLE movimentacoes (
 	REFERENCES caixas (cod)   
   )
 
+CREATE INDEX ixData movimentacoes(data)
+
+
 INSERT INTO movimentacoes (data, usuario, tipo, caixa, valor) 
 				   VALUES (GETDATE(),  1,   1,      1,    100 ) 
 
@@ -84,6 +96,8 @@ INSERT INTO movimentacoes (data, usuario, tipo, caixa, valor)
 --INSERT INTO movimentacoes (data, usuario, tipo, caixa, valor) 
 --				   VALUES (GETDATE(),  1,   1,      1,    100 ) 
 
+--INICIL DA PROCEDURE SpAberturaCaixa
+Create procedure SpAberturaCaixa
 
 
 select * from usuarios
@@ -94,12 +108,29 @@ select * from movimentacoes
 
 Create procedure SpAberturaCaixa()
 AS
-Begin Tran
-if ((select count(*) from caixas where  situacao =0)<1))
 
-INSERT INTO caixas (data, usuario, valor, periodo, situacao, codcaixa)
-					values (GETDATE(), 1, 100, 0, 0, null)
+if ( (SELECT COUT(*) FROM caixas WHERE situacao=0) <=0 )
+  BEGIN TRAN
+	INSERT INTO caixas (dataAbertura, dataFechamento, usuarioAbertura, usuarioFechamento, valorAbertura, valorFechamento, periodo)
+			values (GETDATE(),null, 1,null, 100, null, 0, 0)
+	IF(@@ERRO = 0)
+		BEGIN
+		    COMMIT
+		    SELECT 'OPERAÇÃO REALIZADA COM SUCESSO.'
+		END
+	ELSE 
+		BEGIN
+		    ROLLBACK
+		    SELECT 'ERRO FOI ENCONTRADO AO REALIZAR ESTA OPERAÇÃO'
 
+END
 
+ELSE
+  BEGIN
+	ROLLBACK
+	SELECT 'ERRO: EXISTE OUTRO CAIXA EM ABERTO, NECESSARIO FECHAR PARA CONTINUAR.'
 
+END
+--FIM DA PROCEDURE SpAberturaCaixa
 
+select * from caixas where dataFechamento != NULL
