@@ -33,7 +33,7 @@ CREATE  TABLE caixas (
   valor DECIMAL(8,2) NOT NULL ,
   periodo BIT NOT NULL, -- COMMENT 0 Dia  1 Noite\n
   situacao BIT NOT NULL, -- 0 Aberto  1 Fechado
-  codcaixa INT , -- Cod referente a caixa
+  codcaixa INT , -- Cod referente a caixa  / se o codcaixa = 0  entao o caixa e de abertura 
   PRIMARY KEY (cod),
   FOREIGN KEY (usuario)
 	REFERENCES usuarios (cod), 
@@ -96,24 +96,17 @@ INSERT INTO movimentacoes (data, usuario, tipo, caixa, valor)
 --INSERT INTO movimentacoes (data, usuario, tipo, caixa, valor) 
 --				   VALUES (GETDATE(),  1,   1,      1,    100 ) 
 
+--Implementações (Como pegar a data, para verificar se na data 11/04 tem um caixa DIA fechado, nao deixa abri outro, apenas NOTURNO.)
+
 --INICIL DA PROCEDURE SpAberturaCaixa
-Create procedure SpAberturaCaixa
-
-
-select * from usuarios
-select * from caixas where	
-select * from tipos
-select * from movimentacoes
-
-
-Create procedure SpAberturaCaixa()
+CREATE PROCEDURE SpAberturaCaixa (@usuario INT, @valor DECIMAL(8,2), @periodo BIT)
 AS
-
-if ( (SELECT COUT(*) FROM caixas WHERE situacao=0) <=0 )
-  BEGIN TRAN
-	INSERT INTO caixas (dataAbertura, dataFechamento, usuarioAbertura, usuarioFechamento, valorAbertura, valorFechamento, periodo)
-			values (GETDATE(),null, 1,null, 100, null, 0, 0)
-	IF(@@ERRO = 0)
+Begin tran
+if ( (SELECT COUNT(*) FROM caixas WHERE situacao=0) <=0 )
+  BEGIN
+	INSERT INTO caixas (data, usuario, valor, periodo, situacao, codcaixa)
+			values (GETDATE(), @usuario, @valor, @periodo, 0, 0)
+	IF(@@ERROR = 0)
 		BEGIN
 		    COMMIT
 		    SELECT 'OPERAÇÃO REALIZADA COM SUCESSO.'
@@ -122,6 +115,7 @@ if ( (SELECT COUT(*) FROM caixas WHERE situacao=0) <=0 )
 		BEGIN
 		    ROLLBACK
 		    SELECT 'ERRO FOI ENCONTRADO AO REALIZAR ESTA OPERAÇÃO'
+		END
 
 END
 
@@ -133,4 +127,51 @@ ELSE
 END
 --FIM DA PROCEDURE SpAberturaCaixa
 
-select * from caixas where dataFechamento != NULL
+-- INICIL DA PROCEDURE SpFecharCaixa
+CREATE PROCEDURE SpFecharCaixa (@usuario int, @valor decimal(8,2))
+AS
+BEGIN TRAN
+IF ((SELECT COUNT(*) FROM caixas where situacao=0)=1)
+ BEGIN
+ 
+ DECLARE @codCaixaAberto INT
+ SET @codCaixaAberto = (SELECT COD FROM caixas WHERE situacao=0)
+ DECLARE @periodoAberto INT
+ SET @periodoAberto = (SELECT periodo FROM caixas where cod=@codCaixaAberto)
+ 
+	INSERT INTO caixas (data, usuario, valor, periodo, situacao, codcaixa)
+			values (GETDATE(), @usuario, @valor, @periodoAberto, 1, @codCaixaAberto)
+	
+	IF (@@ERROR = 0)
+		BEGIN
+		SELECT 'CAIXA FECHADO INSERIDO COM SUCESSO'
+		UPDATE caixas SET situacao=1 where cod=@codCaixaAberto
+		IF (@@ERROR=0)
+			BEGIN
+			COMMIT
+			SELECT 'ATUALIZAÇÃO CAIXA ABERTO PARA FECHADO COM SUCESSO'
+			END
+		ELSE 
+			BEGIN
+			ROLLBACK
+			SELECT 'ERRO AO TENTAR ATUALIZAÇÃO CAIXA ABERTO PARA FECHADO COM SUCESSO'
+			END
+		END
+	ELSE 
+		BEGIN
+		ROLLBACK
+		SELECT 'ERRO AO INSERI CAIXA FECHAR'
+		END
+-- FIM DA PROCEDURE SpFecharCaixa			
+	
+	
+
+select * from usuarios
+select * from caixas
+select * from tipos
+select * from movimentacoes
+update caixas set situacao=1
+
+drop procedure SpAberturaCaixa
+exec SpAberturaCaixa 1, 200,1
+
