@@ -1,9 +1,9 @@
+drop database caixa
 Create database caixa
 use caixa
 -- -----------------------------------------------------
 -- Table Usuarios
 -- -----------------------------------------------------
-
 
 CREATE  TABLE usuarios (
   cod INT Identity(1,1) ,
@@ -29,7 +29,7 @@ CREATE  TABLE caixas (
   valor DECIMAL(8,2) NOT NULL ,
   periodo BIT NOT NULL, -- COMMENT 0 Dia  1 Noite\n
   situacao BIT NOT NULL, -- 0 Aberto  1 Fechado
-  codcaixa INT NOT NULL, -- Cod referente a caixa
+  codcaixa INT , -- Cod referente a caixa
   PRIMARY KEY (cod),
   FOREIGN KEY (usuario)
 	REFERENCES usuarios (cod), 
@@ -37,8 +37,8 @@ CREATE  TABLE caixas (
 	REFERENCES caixas (cod) 	
   )
 
-INSERT INTO caixas (dataAbertura, dataFechamento, usuarioAbertura, usuarioFechamento, valorAbertura, valorFechamento, periodo)
-					values (GETDATE(),null, 1,null, 100, null, 0, 0)
+INSERT INTO caixas (data, usuario, valor, periodo, situacao, codcaixa)
+					values (GETDATE(), 1, 100, 0, 0, null)
 
 -- -----------------------------------------------------
 -- Table Tipos
@@ -80,16 +80,26 @@ CREATE  TABLE movimentacoes (
 INSERT INTO movimentacoes (data, usuario, tipo, caixa, valor) 
 				   VALUES (GETDATE(),  1,   1,      1,    100 ) 
 
-INSERT INTO movimentacoes (data, usuario, tipo, caixa, valor) 
-				   VALUES (GETDATE(),  1,   1,      1,    100 ) 
+
+--INSERT INTO movimentacoes (data, usuario, tipo, caixa, valor) 
+--				   VALUES (GETDATE(),  1,   1,      1,    100 ) 
 
 
 
-Create procedure SpMovimentacao
+select * from usuarios
+select * from caixas where	
+select * from tipos
+select * from movimentacoes
+
+
+Create procedure SpAberturaCaixa()
 AS
 Begin Tran
-if 
+if ((select count(*) from caixas where  situacao =0)<1))
+
+INSERT INTO caixas (data, usuario, valor, periodo, situacao, codcaixa)
+					values (GETDATE(), 1, 100, 0, 0, null)
 
 
 
-select * from caixas where dataFechamento != NULL
+
