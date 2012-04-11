@@ -15,6 +15,10 @@ CREATE  TABLE usuarios (
   PRIMARY KEY (cod) 
   )
 
+CREATE INDEX ixNome usuarios(nome)
+CREATE INDEX ixUsuario usuarios(usuario)
+CREATE INDEX ixNivel usuarios(nivel)
+
 INSERT INTO usuarios (nome, usuario, senha, data, nivel) VALUES ('master', 'Adiministrador', '123', getdate(), 0)
 
 
@@ -37,6 +41,9 @@ CREATE  TABLE caixas (
 	REFERENCES caixas (cod) 	
   )
 
+
+CREATE INDEX ixValor caixas(valor)
+
 INSERT INTO caixas (dataAbertura, dataFechamento, usuarioAbertura, usuarioFechamento, valorAbertura, valorFechamento, periodo)
 					values (GETDATE(),null, 1,null, 100, null, 0, 0)
 
@@ -44,7 +51,7 @@ INSERT INTO caixas (dataAbertura, dataFechamento, usuarioAbertura, usuarioFecham
 -- Table Tipos
 -- -----------------------------------------------------
 
---COMMENT = 'Tipo Operação\nSangria\nSuprimento\nCompra material\nCompra etc.'
+--COMMENT = 'Tipo Operaï¿½ï¿½o\nSangria\nSuprimento\nCompra material\nCompra etc.'
 
 CREATE  TABLE tipos (
   cod INT Identity(1,1) ,
@@ -52,6 +59,9 @@ CREATE  TABLE tipos (
   acao BIT NOT NULL, -- COMMENT 0 Debito 1 Credito
   PRIMARY KEY (cod) 
   )
+
+CREATE INDEX ixDescricao tipos(descricao)
+
   INSERT INTO tipos (descricao, acao) VALUES ('ABRI_CAIXA', 1)
   INSERT INTO tipos (descricao, acao) VALUES ('SANGRIA', 0)
   INSERT INTO tipos (descricao, acao) VALUES ('COMPRA', 0)
@@ -60,7 +70,7 @@ CREATE  TABLE tipos (
  
   
 -- -----------------------------------------------------
--- Table Movimentacões
+-- Table Movimentacï¿½es
 -- -----------------------------------------------------
 
 CREATE  TABLE movimentacoes (
@@ -76,6 +86,9 @@ CREATE  TABLE movimentacoes (
   FOREIGN KEY (caixa)
 	REFERENCES caixas (cod)   
   )
+
+CREATE INDEX ixData movimentacoes(data)
+
 
 INSERT INTO movimentacoes (data, usuario, tipo, caixa, valor) 
 				   VALUES (GETDATE(),  1,   1,      1,    100 ) 
