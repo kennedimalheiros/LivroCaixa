@@ -134,34 +134,43 @@ BEGIN TRAN
 IF ((SELECT COUNT(*) FROM caixas where situacao=0)=1)
  BEGIN
  
- DECLARE @codCaixaAberto INT
- SET @codCaixaAberto = (SELECT COD FROM caixas WHERE situacao=0)
- DECLARE @periodoAberto INT
- SET @periodoAberto = (SELECT periodo FROM caixas where cod=@codCaixaAberto)
+   DECLARE @codCaixaAberto INT
+   SET @codCaixaAberto = (SELECT COD FROM caixas WHERE situacao=0)
+   DECLARE @periodoAberto INT
+   SET @periodoAberto = (SELECT periodo FROM caixas where cod=@codCaixaAberto)
  
-	INSERT INTO caixas (data, usuario, valor, periodo, situacao, codcaixa)
+    INSERT INTO caixas (data, usuario, valor, periodo, situacao, codcaixa)
 			values (GETDATE(), @usuario, @valor, @periodoAberto, 1, @codCaixaAberto)
 	
 	IF (@@ERROR = 0)
 		BEGIN
-		SELECT 'CAIXA FECHADO INSERIDO COM SUCESSO'
-		UPDATE caixas SET situacao=1 where cod=@codCaixaAberto
-		IF (@@ERROR=0)
-			BEGIN
-			COMMIT
-			SELECT 'ATUALIZAÇÃO CAIXA ABERTO PARA FECHADO COM SUCESSO'
-			END
-		ELSE 
-			BEGIN
-			ROLLBACK
-			SELECT 'ERRO AO TENTAR ATUALIZAÇÃO CAIXA ABERTO PARA FECHADO COM SUCESSO'
-			END
+		  SELECT 'CAIXA FECHADO INSERIDO COM SUCESSO'
+		  UPDATE caixas SET situacao=1 where cod=@codCaixaAberto
+		  IF (@@ERROR=0)
+	   		  BEGIN
+			  COMMIT
+			  SELECT 'ATUALIZAÇÃO CAIXA ABERTO PARA FECHADO COM SUCESSO'
+			  END
+		  ELSE 
+			  BEGIN
+			  ROLLBACK
+			  SELECT 'ERRO AO TENTAR ATUALIZAÇÃO CAIXA ABERTO PARA FECHADO COM SUCESSO'
+			  END
 		END
 	ELSE 
-		BEGIN
+	    BEGIN
+		      ROLLBACK
+		      SELECT 'ERRO AO INSERI CAIXA FECHAR'
+	    END
+
+
+END		
+ELSE 
+	BEGIN
 		ROLLBACK
-		SELECT 'ERRO AO INSERI CAIXA FECHAR'
-		END
+		SELECT 'NÃO EXISTE CAIXA EM ABERTO'
+    END
+
 -- FIM DA PROCEDURE SpFecharCaixa			
 	
 	
@@ -172,6 +181,7 @@ select * from tipos
 select * from movimentacoes
 update caixas set situacao=1
 
-drop procedure SpAberturaCaixa
-exec SpAberturaCaixa 1, 200,1
+drop procedure SpFecharCaixa
+exec SpAberturaCaixa 1, 200,1  -- Usuario , Valor Abertura de Caixa, Periodo
+exec SpFecharCaixa 1, 300      -- Usuario , Valor em Caixa
 
